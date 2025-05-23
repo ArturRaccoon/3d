@@ -1,4 +1,3 @@
-// Array di messaggi romantici
 const romanticMessages = [
   "Історія кохання починається...",
   "Наші серця б'ються одночасно",
@@ -10,7 +9,6 @@ const romanticMessages = [
   "Ох! Це так мило, ти заповнила моє серцe !",
 ];
 
-// Array di stati del raccoon
 const raccoonStates = [
   'beggining.mp4',
   'sync.mp4',
@@ -22,7 +20,6 @@ const raccoonStates = [
   'raccoon.glb'
 ];
 
-// Posizioni per il raccoon e per i messaggi
 const positions = [
   { top: "30%", left: "10%" },
   { top: "10%", left: "69%" },
@@ -44,7 +41,6 @@ const positionsM = [
   { left: "40%", top: "70%" }
 ];
 
-// Array di immagini/video di sfondo per le pagine
 const pageBackgrounds = [
   'bg1.mp4',
   'bg2.mp4',
@@ -63,7 +59,6 @@ let currentPage;
 const pagesContainer = document.getElementById('pagesContainer');
 const heartSound = document.getElementById('heartSound');
 
-// Smooth scroll function (duration: 1500ms)
 function smoothScrollTo(target, duration) {
   let start = window.pageYOffset;
   let end = target.offsetTop;
@@ -84,10 +79,9 @@ function createPage(index) {
   const page = document.createElement('div');
   page.className = 'page';
 
-  // Create the blurred background element
   const bg = document.createElement('div');
   bg.className = 'page-bg';
-  // If background is a video (mp4), insert a <video>
+
   if (pageBackgrounds[index].endsWith('.mp4')) {
     bg.innerHTML = `
       <video autoplay muted loop playsinline class="bg-video" style="width:100%; height:100%; object-fit:cover;">
@@ -95,22 +89,21 @@ function createPage(index) {
       </video>
     `;
   } else {
-    bg.style.backgroundImage = `url('${pageBackgrounds[index] || 'default.jpg'}')`;
+    bg.style.backgroundImage = `url('${pageBackgrounds[index]}')`;
   }
+
   page.appendChild(bg);
 
-  // Clone the page template content
   const templateContent = document.getElementById('page-template').content.cloneNode(true);
   const container = templateContent.querySelector('.container');
 
-  // Update the progress bar
   const progressFill = container.querySelector('.progress-fill');
   progressFill.style.width = `${(index / maxClicks) * 100}%`;
 
-  // Set the romantic message
   const romanticMessage = container.querySelector('.romantic-message');
   romanticMessage.textContent =
     index === 0 ? romanticMessages[0] : romanticMessages[Math.min(index, romanticMessages.length - 1)];
+
   const posM = positionsM[index] || { left: '50%', top: '10%' };
   if (window.innerWidth > 600) {
     romanticMessage.style.position = 'absolute';
@@ -123,7 +116,6 @@ function createPage(index) {
     romanticMessage.style.margin = '10px auto';
   }
 
-  // Update the raccoon container and media
   const raccoonContainer = container.querySelector('.raccoon-container');
   const raccoon = container.querySelector('.raccoon');
   const currentState = raccoonStates[index] || raccoonStates[raccoonStates.length - 1];
@@ -137,8 +129,8 @@ function createPage(index) {
         auto-rotate 
         camera-controls 
         rotation-per-second="30deg"
-        style="width:100%; height:100%;"
-      ></model-viewer>
+        style="width:100%; height:100%;">
+      </model-viewer>
     `;
     raccoon.style.backgroundImage = '';
   } else if (currentState.endsWith('.mp4')) {
@@ -153,7 +145,6 @@ function createPage(index) {
     raccoon.style.backgroundImage = `url('${currentState}')`;
   }
 
-  // Set raccoon container position
   const pos = positions[index] || positions[positions.length - 1];
   if (window.innerWidth > 600) {
     raccoonContainer.style.position = 'absolute';
@@ -170,7 +161,6 @@ function createPage(index) {
   return page;
 }
 
-// Attach event listeners to all raccoon containers within a page
 function attachEvents(page) {
   const clickableElements = page.querySelectorAll('.raccoon-container');
   clickableElements.forEach(el => {
@@ -184,14 +174,10 @@ function attachEvents(page) {
 function animateRaccoon() {
   const raccoon = currentPage.querySelector('.raccoon');
   raccoon.classList.add('epic');
-  setTimeout(() => {
-    raccoon.classList.remove('epic');
-  }, 1000);
+  setTimeout(() => raccoon.classList.remove('epic'), 1000);
 }
 
-// Create floating hearts relative to the clicked element
 function createHearts(x, y, containerRect, container) {
-  // Calculate position relative to the container
   const relX = x - containerRect.left;
   const relY = y - containerRect.top;
   for (let i = 0; i < 5; i++) {
@@ -214,13 +200,12 @@ function showMark(page) {
   setTimeout(() => mark.remove(), 1000);
 }
 
-// Now the event handler accepts the element that was clicked
 function handleClick(event, clickedElement) {
   if (clickCount >= maxClicks) return;
   clickCount++;
 
   animateRaccoon();
-  // Get bounding rectangle of the clicked container
+
   const rect = clickedElement.getBoundingClientRect();
   createHearts(event.clientX, event.clientY, rect, clickedElement);
   showMark(currentPage);
@@ -235,6 +220,27 @@ function handleClick(event, clickedElement) {
     smoothScrollTo(newPage, 1500);
     currentPage = newPage;
   } else {
+    setTimeout(() => {
+      document.querySelector('.page-transition').style.opacity = '1';
+      setTimeout(() => {
+        window.location.href = 'love-letter.html';
+      }, 1000);
+    }, 1000);
+  }
+}
+
+function goToNextPage() {
+  if (clickCount >= maxClicks) return;
+  clickCount++;
+
+  const newPage = createPage(clickCount);
+  newPage.classList.add('soft-in');
+  pagesContainer.appendChild(newPage);
+  attachEvents(newPage);
+  smoothScrollTo(newPage, 1500);
+  currentPage = newPage;
+
+  if (clickCount >= maxClicks) {
     setTimeout(() => {
       document.querySelector('.page-transition').style.opacity = '1';
       setTimeout(() => {
