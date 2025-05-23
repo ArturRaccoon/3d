@@ -210,6 +210,22 @@ z
   .romantic-message {
     display: none;
   }
+
+  .image-slide {
+    width: 90%;
+    max-width: 250px;
+    height: auto;
+    margin: 10px auto;
+    display: block;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease;
+    cursor: pointer;
+  }
+
+  .image-slide:active {
+    transform: scale(0.98);
+  }
 }
 
 body.mobile .container {
