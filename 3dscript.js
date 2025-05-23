@@ -7,7 +7,7 @@ const romanticMessages = [
   "Ти моє сонце",
   "Ти мої зірки",
   "Я уже близько...",
-  "Ох! Це так мило, ти заповнила моє серце 💞",
+  "Ох! Це так мило, ти заповнила моє серцe !",
 ];
 
 // Array di stati del raccoon
@@ -244,7 +244,10 @@ function handleClick(event, clickedElement) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", function () {
+  const isMobile = window.innerWidth <= 600;
+  document.body.classList.add(isMobile ? "mobile" : "desktop");
+
   currentPage = createPage(0);
   pagesContainer.appendChild(currentPage);
   attachEvents(currentPage);
