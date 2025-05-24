@@ -129,13 +129,14 @@ function createPage(index) {
         auto-rotate 
         camera-controls 
         rotation-per-second="30deg"
-        style="width:100%; height:100%;"
+        style="width:100%; height:100%; clip-path: path('M180,45 C128,0 0,110 180,210 C360,110 232,0 180,45 Z');"
       ></model-viewer>
     `;
     raccoon.style.backgroundImage = '';
   } else if (currentState.endsWith('.mp4')) {
     raccoon.innerHTML = `
-      <video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+      <video autoplay muted loop playsinline 
+        style="width:100%; height:100%; object-fit:cover; clip-path: path('M180,45 C128,0 0,110 180,210 C360,110 232,0 180,45 Z');">
         <source src="${currentState}" type="video/mp4">
       </video>
     `;
@@ -143,6 +144,7 @@ function createPage(index) {
   } else {
     raccoon.innerHTML = "";
     raccoon.style.backgroundImage = `url('${currentState}')`;
+    raccoon.style.clipPath = "path('M180,45 C128,0 0,110 180,210 C360,110 232,0 180,45 Z')";
   }
 
   // Set raccoon container position
