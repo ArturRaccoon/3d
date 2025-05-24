@@ -13,15 +13,41 @@ const romanticMessages = [
 // Array di stati del raccoon
 const raccoonStates = [
   'beggining.mp4', 'sync.mp4', 'lines.mp4', 'moon.mp4',
-  'sun.mp4', 'stars.mp4', 'heart.mp4', 'raccoon.glb'
+  'sun.mp4', 'stars.mp4', 'heart.mp4', 'heart.jpg'
 ];
 
-const positions = Array(8).fill({ top: "200%", left: "0%" });
-const positionsM = Array(7).fill({ left: "0%", top: "200%" });
+// Posizioni per il raccoon e per i messaggi
+const positions = [
+  { top: "200%", left: "0%" },
+  { top: "200%", left: "0%" },
+  { top: "200%", left: "0%" },  
+  { top: "200%", left: "0%" },
+  { top: "200%", left: "0%" },  
+  { top: "200%", left: "0%" },
+  { top: "200%", left: "0%" },   
+  { top: "200%", left: "0%" }
+];
 
+const positionsM = [
+  { left: "0%", top: "200%" },
+  { left: "0%", top: "200%" },
+  { left: "0%", top: "200%" },
+  { left: "0%", top: "200%" },
+  { left: "0%", top: "200%" },
+  { left: "0%", top: "200%" },
+  { left: "0%", top: "200%" }
+];
+
+// Array di immagini/video di sfondo per le pagine
 const pageBackgrounds = [
-  'bg1.mp4', 'bg2.mp4', 'bg3.mp4', 'bg4.mp4',
-  'bg5.mp4', 'bg6.mp4', 'bg7.mp4', 'bg8.jpg'
+  'bg1.mp4',
+  'bg2.mp4',
+  'bg3.mp4',
+  'bg4.mp4',
+  'bg5.mp4',
+  'bg6.mp4',
+  'bg7.mp4',
+  'bg8.jpg'
 ];
 
 let clickCount = 0;
@@ -31,6 +57,7 @@ let currentPage;
 const pagesContainer = document.getElementById('pagesContainer');
 const heartSound = document.getElementById('heartSound');
 
+// Smooth scroll function (duration: 1500ms)
 function smoothScrollTo(target, duration) {
   let start = window.pageYOffset;
   let end = target.offsetTop;
@@ -51,52 +78,65 @@ function createPage(index) {
   const page = document.createElement('div');
   page.className = 'page';
 
+  // Add SVG clip path once if not already present
+  if (!document.getElementById('heart-svg-clip')) {
+    const svgNS = `
+      <svg width="0" height="0" style="position:absolute" id="heart-svg-clip" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="heartClip" clipPathUnits="objectBoundingBox">
+            <path d="M0.5,0.25 C0.355,0.0, 0.0,0.458, 0.5,0.875 C1.0,0.458, 0.645,0.0, 0.5,0.25 Z" />
+          </clipPath>
+        </defs>
+      </svg>
+    `;
+    document.body.insertAdjacentHTML('afterbegin', svgNS);
+  }
+
+  // Create the blurred background element
   const bg = document.createElement('div');
   bg.className = 'page-bg';
+  // If background is a video (mp4), insert a <video>
   if (pageBackgrounds[index].endsWith('.mp4')) {
     bg.innerHTML = `
       <video autoplay muted loop playsinline class="bg-video" style="width:100%; height:100%; object-fit:cover;">
         <source src="${pageBackgrounds[index]}" type="video/mp4">
-      </video>`;
+      </video>
+    `;
   } else {
     bg.style.backgroundImage = `url('${pageBackgrounds[index] || 'default.jpg'}')`;
   }
   page.appendChild(bg);
 
+  // Clone the page template content
   const templateContent = document.getElementById('page-template').content.cloneNode(true);
   const container = templateContent.querySelector('.container');
 
+  // Update the progress bar
   const progressFill = container.querySelector('.progress-fill');
   progressFill.style.width = `${(index / maxClicks) * 100}%`;
 
+  // Set the romantic message
   const romanticMessage = container.querySelector('.romantic-message');
-  romanticMessage.textContent = index === 0 ? romanticMessages[0] : romanticMessages[Math.min(index, romanticMessages.length - 1)];
+  romanticMessage.textContent =
+    index === 0 ? romanticMessages[0] : romanticMessages[Math.min(index, romanticMessages.length - 1)];
   const posM = positionsM[index] || { left: '50%', top: '10%' };
   romanticMessage.style.left = posM.left;
   romanticMessage.style.top = posM.top;
 
+  // Update the raccoon container and media
   const raccoonContainer = container.querySelector('.raccoon-container');
   const raccoon = container.querySelector('.raccoon');
   const currentState = raccoonStates[index] || raccoonStates[raccoonStates.length - 1];
 
-  if (currentState.endsWith('.glb')) {
-    raccoon.innerHTML = `
-      <model-viewer 
-        src="${currentState}" 
-        autoplay 
-        animation-name="dance" 
-        auto-rotate 
-        camera-controls 
-        rotation-per-second="30deg"
-        style="width:100%; height:100%; border-radius: 50%; mask-image: radial-gradient(circle at center, black 60%, transparent 100%); -webkit-mask-image: radial-gradient(circle at center, black 60%, transparent 100%);"
-      ></model-viewer>`;
-    raccoon.style.backgroundImage = '';
-  } else if (currentState.endsWith('.mp4')) {
+  if (currentState.endsWith('.mp4')) {
     raccoon.innerHTML = `
       <video autoplay muted loop playsinline 
-        style="width:100%; height:100%; object-fit:cover; border-radius: 50%; mask-image: radial-gradient(circle at center, black 60%, transparent 100%); -webkit-mask-image: radial-gradient(circle at center, black 60%, transparent 100%);">
+        style="width:100%; height:100%; object-fit:cover; border-radius: 50%; 
+               mask-image: radial-gradient(circle at center, black 60%, transparent 100%);
+               -webkit-mask-image: radial-gradient(circle at center, black 60%, transparent 100%);">
         <source src="${currentState}" type="video/mp4">
-      </video>`;
+      </video>
+    `;
     raccoon.style.backgroundImage = '';
   } else {
     raccoon.innerHTML = "";
@@ -106,6 +146,7 @@ function createPage(index) {
     raccoon.style.webkitMaskImage = "radial-gradient(circle at center, black 60%, transparent 100%)";
   }
 
+  // Set raccoon container position
   const pos = positions[index] || positions[positions.length - 1];
   raccoonContainer.style.top = pos.top;
   raccoonContainer.style.left = pos.left;
@@ -114,6 +155,7 @@ function createPage(index) {
   return page;
 }
 
+// Attach event listeners to all raccoon containers within a page
 function attachEvents(page) {
   const clickableElements = page.querySelectorAll('.raccoon-container');
   clickableElements.forEach(el => {
@@ -127,10 +169,14 @@ function attachEvents(page) {
 function animateRaccoon() {
   const raccoon = currentPage.querySelector('.raccoon');
   raccoon.classList.add('epic');
-  setTimeout(() => raccoon.classList.remove('epic'), 1000);
+  setTimeout(() => {
+    raccoon.classList.remove('epic');
+  }, 1000);
 }
 
+// Create floating hearts relative to the clicked element
 function createHearts(x, y, containerRect, container) {
+  // Calculate position relative to the container
   const relX = x - containerRect.left;
   const relY = y - containerRect.top;
   for (let i = 0; i < 5; i++) {
@@ -153,11 +199,13 @@ function showMark(page) {
   setTimeout(() => mark.remove(), 1000);
 }
 
+// Now the event handler accepts the element that was clicked
 function handleClick(event, clickedElement) {
   if (clickCount >= maxClicks) return;
   clickCount++;
 
   animateRaccoon();
+  // Get bounding rectangle of the clicked container
   const rect = clickedElement.getBoundingClientRect();
   createHearts(event.clientX, event.clientY, rect, clickedElement);
   showMark(currentPage);
@@ -174,7 +222,9 @@ function handleClick(event, clickedElement) {
   } else {
     setTimeout(() => {
       document.querySelector('.page-transition').style.opacity = '1';
-      setTimeout(() => window.location.href = 'love-letter.html', 1000);
+      setTimeout(() => {
+        window.location.href = 'love-letter.html';
+      }, 1000);
     }, 1000);
   }
 }
