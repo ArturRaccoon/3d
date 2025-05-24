@@ -131,8 +131,8 @@ function createPage(index) {
   if (currentState.endsWith('.mp4')) {
     raccoon.innerHTML = `
       <video autoplay muted loop playsinline 
-        style="width:100%; height:100%; object-fit:cover; border-radius: 50%; 
-               mask-image: radial-gradient(circle at center, black 60%, transparent 100%);
+  style="width:100%; height:100%; object-fit:cover; border-radius: 50%;"               
+  mask-image: radial-gradient(circle at center, black 60%, transparent 100%);
                -webkit-mask-image: radial-gradient(circle at center, black 60%, transparent 100%);">
         <source src="${currentState}" type="video/mp4">
       </video>
