@@ -84,6 +84,20 @@ function createPage(index) {
   const page = document.createElement('div');
   page.className = 'page';
 
+  // Add SVG clip path once if not already present
+  if (!document.getElementById('heart-svg-clip')) {
+    const svgNS = `
+      <svg width="0" height="0" style="position:absolute" id="heart-svg-clip" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="heartClip" clipPathUnits="objectBoundingBox">
+            <path d="M0.5,0.25 C0.355,0.0, 0.0,0.458, 0.5,0.875 C1.0,0.458, 0.645,0.0, 0.5,0.25 Z" />
+          </clipPath>
+        </defs>
+      </svg>
+    `;
+    document.body.insertAdjacentHTML('afterbegin', svgNS);
+  }
+
   // Create the blurred background element
   const bg = document.createElement('div');
   bg.className = 'page-bg';
@@ -129,14 +143,14 @@ function createPage(index) {
         auto-rotate 
         camera-controls 
         rotation-per-second="30deg"
-        style="width:100%; height:100%; clip-path: path('M180,45 C128,0 0,110 180,210 C360,110 232,0 180,45 Z');"
+        style="width:100%; height:100%; clip-path: url(#heartClip);"
       ></model-viewer>
     `;
     raccoon.style.backgroundImage = '';
   } else if (currentState.endsWith('.mp4')) {
     raccoon.innerHTML = `
       <video autoplay muted loop playsinline 
-        style="width:100%; height:100%; object-fit:cover; clip-path: path('M180,45 C128,0 0,110 180,210 C360,110 232,0 180,45 Z');">
+        style="width:100%; height:100%; object-fit:cover; clip-path: url(#heartClip);">
         <source src="${currentState}" type="video/mp4">
       </video>
     `;
@@ -144,7 +158,7 @@ function createPage(index) {
   } else {
     raccoon.innerHTML = "";
     raccoon.style.backgroundImage = `url('${currentState}')`;
-    raccoon.style.clipPath = "path('M180,45 C128,0 0,110 180,210 C360,110 232,0 180,45 Z')";
+    raccoon.style.clipPath = "url(#heartClip)";
   }
 
   // Set raccoon container position
