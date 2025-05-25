@@ -1,11 +1,9 @@
-
 /* Reset and Base Settings */
 body {
   margin: 0;
   font-family: 'Dancing Script', cursive;
   background: #061117;
-  overflow: hidden;
-}
+  overflow: visible !important;}
 
 /* Smooth scroll container */
 #pagesContainer {
@@ -17,8 +15,7 @@ body {
   height: 100vh;
   width: 100%;
   position: relative;
-  overflow: hidden;
-}
+  overflow: visible !important;}
 
 /* Blurred Background for Pages */
 .page-bg {
@@ -39,15 +36,18 @@ body {
     opacity: 0;
     transform: translateY(20px) scale(0.95);
   }
+
   50% {
     opacity: 0.5;
     transform: translateY(10px) scale(0.98);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
 }
+
 .soft-in {
   animation: softIn 1.9s forwards;
 }
@@ -68,7 +68,23 @@ body {
   overflow: hidden;
   margin: 20px auto;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
+
+@media screen and (max-width: 375px) {
+  .progress-bar {
+    width: 90%;
+    height: 12px;
+    margin: 0;
+  }
+}
+
 .progress-fill {
   height: 100%;
   width: 0%;
@@ -95,8 +111,10 @@ body {
 
 .raccoon-container {
   position: absolute;
-  width: 320px; /* Reduced from 640px */
-  height: 180px; /* Reduced from 360px */
+  width: 320px;
+  /* Reduced from 640px */
+  height: 180px;
+  /* Reduced from 360px */
   transition: transform 0.5s ease-in-out;
   cursor: pointer;
 }
@@ -111,24 +129,35 @@ body {
 
 /* Floating Animation for Raccoon */
 @keyframes floating {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0); }
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
 }
 
 /* Epic Transformation for Raccoon */
 .epic {
   animation: epicTransform 1s ease forwards;
 }
+
 @keyframes epicTransform {
   0% {
     transform: scale(0.8) rotate(20deg);
     opacity: 0;
   }
+
   50% {
     transform: scale(1.05) rotate(-10deg);
     opacity: 1;
   }
+
   100% {
     transform: scale(1) rotate(0deg);
     opacity: 1;
@@ -144,6 +173,7 @@ body {
   transform: rotate(-45deg);
   animation: float 2s linear forwards;
 }
+
 .heart::before,
 .heart::after {
   content: "";
@@ -153,19 +183,23 @@ body {
   border-radius: 50%;
   position: absolute;
 }
+
 .heart::before {
   top: -10px;
   left: 0;
 }
+
 .heart::after {
   top: 0;
   left: 10px;
 }
+
 @keyframes float {
   0% {
     opacity: 1;
     transform: translateY(0) scale(1) rotate(-45deg);
   }
+
   100% {
     opacity: 0;
     transform: translateY(-100px) scale(1.2) rotate(-45deg);
@@ -183,15 +217,18 @@ body {
   opacity: 0;
   animation: markFade 1s forwards;
 }
+
 @keyframes markFade {
   0% {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.5);
   }
+
   50% {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1.2);
   }
+
   100% {
     opacity: 0;
     transform: translate(-50%, -50%) scale(1);
