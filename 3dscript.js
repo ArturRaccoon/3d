@@ -1,236 +1,226 @@
-// Array di messaggi romantici
 const romanticMessages = [
-  "Історія кохання починається...",
-  "Наші серця б'ються одночасно",
-  "Моя лінія життя перетинається з твоєю",
-  "Ти мій місяць",
-  "Ти моє сонце",
-  "Ти мої зірки",
-  "Я уже близько...",
-  "Ох! Це так мило, ти заповнила моє серце 💞",
+    "Історія кохання починається...",
+    "Наші серця б'ються одночасно",
+    "Моя лінія життя перетинається тобою",
+    "Ти мій місяць",
+    "Ти моє сонце",
+    "Ти мої зірки",
+    "Я уже близько...",
+    "Ох! Це так мило, ти заповнила моє серце 💞",
 ];
 
-// Array di stati del raccoon
 const raccoonStates = [
-  'beggining.mp4', 'sync.mp4', 'lines.mp4', 'moon.mp4',
-  'sun.mp4', 'stars.mp4', 'heart.mp4', 'heart.jpg'
+    'beggining.mp4',
+    'sync.mp4',
+    'lines.mp4',
+    'moon.mp4',
+    'sun.mp4',
+    'stars.mp4',
+    'heart.mp4',
+    'raccoon.glb'
 ];
 
-// Posizioni per il raccoon e per i messaggi
 const positions = [
-  { top: "200%", left: "0%" },
-  { top: "200%", left: "0%" },
-  { top: "200%", left: "0%" },  
-  { top: "200%", left: "0%" },
-  { top: "200%", left: "0%" },  
-  { top: "200%", left: "0%" },
-  { top: "200%", left: "0%" },   
-  { top: "200%", left: "0%" }
+    { top: "30%", left: "10%" },
+    { top: "10%", left: "69%" },
+    { top: "20%", left: "10%" },
+    { top: "60%", left: "50%" },
+    { top: "10%", left: "30%" },
+    { top: "65%", left: "65%" },
+    { top: "30%", left: "30%" },
+    { top: "50%", left: "50%" }
 ];
 
 const positionsM = [
-  { left: "0%", top: "200%" },
-  { left: "0%", top: "200%" },
-  { left: "0%", top: "200%" },
-  { left: "0%", top: "200%" },
-  { left: "0%", top: "200%" },
-  { left: "0%", top: "200%" },
-  { left: "0%", top: "200%" }
+    { left: "10%", top: "10%" },
+    { left: "60%", top: "15%" },
+    { left: "20%", top: "30%" },
+    { left: "50%", top: "90%" },
+    { left: "30%", top: "50%" },
+    { left: "70%", top: "60%" },
+    { left: "40%", top: "70%" }
 ];
 
-// Array di immagini/video di sfondo per le pagine
 const pageBackgrounds = [
-  'bg1.mp4',
-  'bg2.mp4',
-  'bg3.mp4',
-  'bg4.mp4',
-  'bg5.mp4',
-  'bg6.mp4',
-  'bg7.mp4',
-  'bg8.jpg'
+    'bg1.mp4',
+    'bg2.mp4',
+    'bg3.mp4',
+    'bg4.mp4',
+    'bg5.mp4',
+    'bg6.mp4',
+    'bg7.mp4',
+    'bg8.jpg'
 ];
 
 let clickCount = 0;
-const maxClicks = 8;
+const maxClicks = raccoonStates.length - 1;
 let currentPage;
-
 const pagesContainer = document.getElementById('pagesContainer');
 const heartSound = document.getElementById('heartSound');
 
-// Smooth scroll function (duration: 1500ms)
 function smoothScrollTo(target, duration) {
-  let start = window.pageYOffset;
-  let end = target.offsetTop;
-  let distance = end - start;
-  let startTime = null;
+    const start = window.pageYOffset;
+    const end = target.offsetTop;
+    const distance = end - start;
+    const startTime = performance.now();
 
-  function animation(currentTime) {
-    if (!startTime) startTime = currentTime;
-    let elapsed = currentTime - startTime;
-    let progress = Math.min(elapsed / duration, 1);
-    window.scrollTo(0, start + distance * progress);
-    if (elapsed < duration) requestAnimationFrame(animation);
-  }
-  requestAnimationFrame(animation);
+    function scrollStep(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        window.scrollTo(0, start + distance * progress);
+        if (elapsed < duration) requestAnimationFrame(scrollStep);
+    }
+    
+    requestAnimationFrame(scrollStep);
 }
 
 function createPage(index) {
-  const page = document.createElement('div');
-  page.className = 'page';
+    const page = document.createElement('div');
+    page.className = 'page soft-in';
 
-  // Add SVG clip path once if not already present
-  if (!document.getElementById('heart-svg-clip')) {
-    const svgNS = `
-      <svg width="0" height="0" style="position:absolute" id="heart-svg-clip" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <clipPath id="heartClip" clipPathUnits="objectBoundingBox">
-            <path d="M0.5,0.25 C0.355,0.0, 0.0,0.458, 0.5,0.875 C1.0,0.458, 0.645,0.0, 0.5,0.25 Z" />
-          </clipPath>
-        </defs>
-      </svg>
-    `;
-    document.body.insertAdjacentHTML('afterbegin', svgNS);
-  }
+    // Background
+    const bg = document.createElement('div');
+    bg.className = 'page-bg';
+    
+    if (pageBackgrounds[index].endsWith('.mp4')) {
+        bg.innerHTML = `
+            <video 
+                autoplay 
+                muted 
+                playsinline 
+                loop 
+                class="bg-video"
+                style="width:100%; height:100%; object-fit:cover;"
+            >
+                <source src="${pageBackgrounds[index]}" type="video/mp4">
+            </video>
+        `;
+    } else {
+        bg.style.backgroundImage = `url('${pageBackgrounds[index]}')`;
+    }
+    
+    page.appendChild(bg);
 
-  // Create the blurred background element
-  const bg = document.createElement('div');
-  bg.className = 'page-bg';
-  // If background is a video (mp4), insert a <video>
-  if (pageBackgrounds[index].endsWith('.mp4')) {
-    bg.innerHTML = `
-      <video autoplay muted loop playsinline class="bg-video" style="width:100%; height:100%; object-fit:cover;">
-        <source src="${pageBackgrounds[index]}" type="video/mp4">
-      </video>
-    `;
-  } else {
-    bg.style.backgroundImage = `url('${pageBackgrounds[index] || 'default.jpg'}')`;
-  }
-  page.appendChild(bg);
+    // Page content
+    const container = document.createElement('div');
+    container.className = 'container';
+    
+    // Progress bar
+    const progressBar = document.createElement('div');
+    progressBar.className = 'progress-bar';
+    progressBar.innerHTML = `<div class="progress-fill" style="width:${(index / maxClicks) * 100}%"></div>`;
+    container.appendChild(progressBar);
 
-  // Clone the page template content
-  const templateContent = document.getElementById('page-template').content.cloneNode(true);
-  const container = templateContent.querySelector('.container');
+    // Romantic message
+    const message = document.createElement('div');
+    message.className = 'romantic-message';
+    message.textContent = romanticMessages[index];
+    Object.assign(message.style, positionsM[index] || {});
+    container.appendChild(message);
 
-  // Update the progress bar
-  const progressFill = container.querySelector('.progress-fill');
-  progressFill.style.width = `${(index / maxClicks) * 100}%`;
+    // Raccoon container
+    const raccoonContainer = document.createElement('div');
+    raccoonContainer.className = 'raccoon-container';
+    Object.assign(raccoonContainer.style, positions[index] || {});
 
-  // Set the romantic message
-  const romanticMessage = container.querySelector('.romantic-message');
-  romanticMessage.textContent =
-    index === 0 ? romanticMessages[0] : romanticMessages[Math.min(index, romanticMessages.length - 1)];
-  const posM = positionsM[index] || { left: '50%', top: '10%' };
-  romanticMessage.style.left = posM.left;
-  romanticMessage.style.top = posM.top;
-
-  // Update the raccoon container and media
-  const raccoonContainer = container.querySelector('.raccoon-container');
-  const raccoon = container.querySelector('.raccoon');
-  const currentState = raccoonStates[index] || raccoonStates[raccoonStates.length - 1];
-
-  if (currentState.endsWith('.mp4')) {
-    raccoon.innerHTML = `
-      <video autoplay muted loop playsinline 
-  style="width:100%; height:100%; object-fit:cover; border-radius: 50%;"               
-  mask-image: radial-gradient(circle at center, black 60%, transparent 100%);
-               -webkit-mask-image: radial-gradient(circle at center, black 60%, transparent 100%);">
-        <source src="${currentState}" type="video/mp4">
-      </video>
-    `;
-    raccoon.style.backgroundImage = '';
-  } else {
-    raccoon.innerHTML = "";
-    raccoon.style.backgroundImage = `url('${currentState}')`;
-    raccoon.style.borderRadius = "50%";
-    raccoon.style.maskImage = "radial-gradient(circle at center, black 60%, transparent 100%)";
-    raccoon.style.webkitMaskImage = "radial-gradient(circle at center, black 60%, transparent 100%)";
-  }
-
-  // Set raccoon container position
-  const pos = positions[index] || positions[positions.length - 1];
-  raccoonContainer.style.top = pos.top;
-  raccoonContainer.style.left = pos.left;
-
-  page.appendChild(container);
-  return page;
+    const mediaElement = document.createElement('div');
+    mediaElement.className = 'raccoon';
+    
+    if (raccoonStates[index].endsWith('.glb')) {
+        mediaElement.innerHTML = `
+            <model-viewer 
+                src="${raccoonStates[index]}" 
+                autoplay 
+                animation-name="dance" 
+                auto-rotate 
+                camera-controls 
+                style="width:100%; height:100%;"
+            ></model-viewer>
+        `;
+    } else {
+        mediaElement.innerHTML = `
+            <video 
+                autoplay 
+                muted 
+                playsinline 
+                loop 
+                style="width:100%; height:100%; object-fit:contain;"
+            >
+                <source src="${raccoonStates[index]}" type="video/mp4">
+            </video>
+        `;
+    }
+    
+    raccoonContainer.appendChild(mediaElement);
+    container.appendChild(raccoonContainer);
+    page.appendChild(container);
+    
+    return page;
 }
 
-// Attach event listeners to all raccoon containers within a page
 function attachEvents(page) {
-  const clickableElements = page.querySelectorAll('.raccoon-container');
-  clickableElements.forEach(el => {
-    el.addEventListener('pointerdown', (e) => {
-      e.preventDefault();
-      handleClick(e, el);
-    });
-  });
+    const raccoonContainer = page.querySelector('.raccoon-container');
+    
+    const handleClick = (e) => {
+        e.preventDefault();
+        if (clickCount < maxClicks) handleInteraction(e, raccoonContainer);
+    };
+
+    raccoonContainer.addEventListener('click', handleClick);
+    raccoonContainer.addEventListener('touchstart', handleClick, { passive: false });
 }
 
-function animateRaccoon() {
-  const raccoon = currentPage.querySelector('.raccoon');
-  raccoon.classList.add('epic');
-  setTimeout(() => {
-    raccoon.classList.remove('epic');
-  }, 1000);
+function handleInteraction(event, container) {
+    clickCount++;
+    animateElements(container);
+    
+    if (clickCount <= maxClicks) {
+        const newPage = createPage(clickCount);
+        pagesContainer.appendChild(newPage);
+        smoothScrollTo(newPage, 1000);
+        attachEvents(newPage);
+        currentPage = newPage;
+    } else {
+        setTimeout(() => {
+            document.querySelector('.page-transition').style.opacity = '1';
+            setTimeout(() => window.location.href = 'love-letter.html', 1000);
+        }, 1000);
+    }
 }
 
-// Create floating hearts relative to the clicked element
-function createHearts(x, y, containerRect, container) {
-  // Calculate position relative to the container
-  const relX = x - containerRect.left;
-  const relY = y - containerRect.top;
-  for (let i = 0; i < 5; i++) {
-    const heart = document.createElement('div');
-    heart.className = 'heart';
-    heart.style.left = `${relX}px`;
-    heart.style.top = `${relY}px`;
-    heart.style.animation = `float ${2 + i}s linear forwards`;
-    container.appendChild(heart);
-    setTimeout(() => heart.remove(), (2 + i) * 1000);
-  }
+function animateElements(container) {
+    // Heart animation
+    createHearts(container);
+    heartSound.play().catch(() => {});
+
+    // Raccoon animation
+    const raccoon = container.querySelector('.raccoon');
+    raccoon.classList.add('epic');
+    setTimeout(() => raccoon.classList.remove('epic'), 1000);
 }
 
-function showMark(page) {
-  const raccoonContainer = page.querySelector('.raccoon-container');
-  const mark = document.createElement('div');
-  mark.className = 'picture-mark';
-  mark.textContent = '✓';
-  raccoonContainer.appendChild(mark);
-  setTimeout(() => mark.remove(), 1000);
-}
-
-// Now the event handler accepts the element that was clicked
-function handleClick(event, clickedElement) {
-  if (clickCount >= maxClicks) return;
-  clickCount++;
-
-  animateRaccoon();
-  // Get bounding rectangle of the clicked container
-  const rect = clickedElement.getBoundingClientRect();
-  createHearts(event.clientX, event.clientY, rect, clickedElement);
-  showMark(currentPage);
-  heartSound.currentTime = 0;
-  heartSound.play();
-
-  if (clickCount < maxClicks) {
-    const newPage = createPage(clickCount);
-    newPage.classList.add('soft-in');
-    pagesContainer.appendChild(newPage);
-    attachEvents(newPage);
-    smoothScrollTo(newPage, 1500);
-    currentPage = newPage;
-  } else {
-    setTimeout(() => {
-      document.querySelector('.page-transition').style.opacity = '1';
-      setTimeout(() => {
-        window.location.href = 'love-letter.html';
-      }, 1000);
-    }, 1000);
-  }
+function createHearts(container) {
+    const rect = container.getBoundingClientRect();
+    const x = rect.left + rect.width/2;
+    const y = rect.top + rect.height/2;
+    
+    for (let i = 0; i < 5; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        Object.assign(heart.style, {
+            left: `${x}px`,
+            top: `${y}px`,
+            animationDelay: `${i * 0.2}s`,
+            animationDuration: `${1.5 + i * 0.3}s`
+        });
+        
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 2000 + i * 300);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  currentPage = createPage(0);
-  pagesContainer.appendChild(currentPage);
-  attachEvents(currentPage);
+    currentPage = createPage(0);
+    pagesContainer.appendChild(currentPage);
+    attachEvents(currentPage);
 });
