@@ -1,4 +1,4 @@
-/* Reset di base */
+/* Reset e impostazioni base */
 * {
   margin: 0;
   padding: 0;
@@ -10,14 +10,12 @@ body {
   background: #061117;
   overflow-x: hidden;
   min-height: 100vh;
-  line-height: 1.6;
 }
 
-/* Contenitore principale */
+/* Contenitore delle pagine */
 #pagesContainer {
   scroll-behavior: smooth;
   position: relative;
-  z-index: 1;
 }
 
 /* Configurazione pagina */
@@ -26,9 +24,6 @@ body {
   width: 100vw;
   position: relative;
   overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 /* Sfondo pagine */
@@ -41,175 +36,169 @@ body {
   z-index: -1;
   background-size: cover;
   background-position: center;
-  filter: blur(8px) brightness(0.8);
+  filter: blur(8px);
 }
 
 .page-bg video {
-  object-fit: cover;
   width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 
 /* Barra di progresso */
 .progress-bar {
   width: 80%;
-  height: 8px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 4px;
+  height: 15px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
   margin: 20px auto;
-  position: relative;
-  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(45deg, #ff4081, #ff80ab);
-  border-radius: 4px;
-  transition: width 0.3s ease;
+  width: 0%;
+  background: linear-gradient(90deg, #ff4081, #ff80ab);
+  border-radius: 10px;
+  transition: width 0.5s ease;
 }
 
 /* Messaggio romantico */
 .romantic-message {
   position: absolute;
-  font-size: 4.5vmin;
-  color: white;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-  padding: 15px 20px;
+  font-size: 1.5em;
+  padding: 10px 15px;
   border-radius: 15px;
-  background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.1));
-  backdrop-filter: blur(4px);
+  background: linear-gradient(3deg, #ff7467, #ff0099, #ff5050, #ff00d9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
+  transition: all 0.5s ease;
   z-index: 20;
-  transition: transform 0.3s ease;
 }
 
-/* Contenitore principale del procione */
+/* Contenitore del procione */
 .raccoon-container {
   position: absolute;
-  width: 60vmin;
-  height: 33.75vmin;
+  width: 320px;
+  height: 180px;
   cursor: pointer;
-  z-index: 50;
-  transform: translate(-50%, -50%);
-  transition: transform 0.3s ease;
+  transition: transform 0.5s ease;
 }
 
 .raccoon {
-  width: 100%;
-  height: 100%;
-  background-size: contain;
+  width: 116%;
+  height: 116%;
+  background-size: cover;
   background-position: center;
-  position: relative;
-}
-
-.raccoon video {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  clip-path: path("M180,45 C128,0 0,110 180,210 C360,110 232,0 180,45 Z");
 }
 
 /* Animazione galleggiamento */
 @keyframes floating {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
 }
 
-.raccoon-container:hover {
-  transform: translate(-50%, -55%);
-}
-
-/* Cuori animati */
+/* Cuori originali */
 .heart {
   position: absolute;
-  width: 8vmin;
-  height: 8vmin;
-  background: red;
+  width: 20px;
+  height: 20px;
+  background-color: red;
   transform: rotate(-45deg);
   animation: float 2s linear forwards;
-  pointer-events: none;
-  z-index: 100;
 }
 
 .heart::before,
 .heart::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: inherit;
+  content: "";
+  width: 20px;
+  height: 20px;
+  background-color: red;
   border-radius: 50%;
+  position: absolute;
 }
 
 .heart::before {
-  top: -50%;
+  top: -10px;
   left: 0;
 }
 
 .heart::after {
   top: 0;
-  left: 50%;
+  left: 10px;
 }
 
 @keyframes float {
   0% {
-    transform: translateY(0) scale(1);
     opacity: 1;
+    transform: translateY(0) scale(1) rotate(-45deg);
   }
   100% {
-    transform: translateY(-100px) scale(1.2);
     opacity: 0;
+    transform: translateY(-100px) scale(1.2) rotate(-45deg);
   }
 }
 
 /* Animazione trasformazione */
 @keyframes epicTransform {
   0% {
-    transform: scale(0.8) rotate(15deg);
+    transform: scale(0.8) rotate(20deg);
     opacity: 0;
   }
   50% {
-    transform: scale(1.1) rotate(-5deg);
+    transform: scale(1.05) rotate(-10deg);
     opacity: 1;
   }
   100% {
-    transform: scale(1) rotate(0);
+    transform: scale(1) rotate(0deg);
     opacity: 1;
   }
 }
 
 .epic {
-  animation: epicTransform 0.8s ease forwards;
+  animation: epicTransform 1s ease forwards;
 }
 
 /* Checkmark animato */
 .picture-mark {
   position: absolute;
-  font-size: 6vmin;
-  color: #00ff00;
-  text-shadow: 0 0 15px #00ff00;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3em;
+  color: #00ae00;
   opacity: 0;
-  animation: mark 1.5s forwards;
+  animation: markFade 1s forwards;
 }
 
-@keyframes mark {
-  0% { opacity: 0; transform: scale(0.5); }
-  50% { opacity: 1; transform: scale(1.2); }
-  100% { opacity: 0; transform: scale(1); }
+@keyframes markFade {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 /* Responsive */
-@media (max-width: 600px) {
-  .romantic-message {
-    font-size: 3.5vmin;
-    padding: 10px 15px;
-  }
-  
+@media (max-width: 768px) {
   .raccoon-container {
-    width: 70vmin;
-    height: 40vmin;
+    width: 240px;
+    height: 135px;
+    transform: scale(0.8);
   }
   
-  .heart {
-    width: 10vmin;
-    height: 10vmin;
+  .romantic-message {
+    font-size: 1.2em;
   }
 }
