@@ -172,7 +172,7 @@ function attachEvents(page) {
 
 function handleInteraction(event, container) {
     clickCount++;
-    animateElements(container);
+    animateElements(container, event);
     
     if (clickCount <= maxClicks) {
         const newPage = createPage(clickCount);
@@ -188,34 +188,31 @@ function handleInteraction(event, container) {
     }
 }
 
-function animateElements(container) {
-    // Heart animation
-    createHearts(container);
-    heartSound.play().catch(() => {});
-
+function animateElements(container, event) {
     // Raccoon animation
     const raccoon = container.querySelector('.raccoon');
     raccoon.classList.add('epic');
     setTimeout(() => raccoon.classList.remove('epic'), 1000);
+
+    // Heart animation
+    createHearts(event, container);
+    heartSound.play().catch(() => {});
 }
 
-function createHearts(container) {
+function createHearts(event, container) {
     const rect = container.getBoundingClientRect();
-    const x = rect.left + rect.width/2;
-    const y = rect.top + rect.height/2;
-    
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
     for (let i = 0; i < 5; i++) {
         const heart = document.createElement('div');
         heart.className = 'heart';
-        Object.assign(heart.style, {
-            left: `${x}px`,
-            top: `${y}px`,
-            animationDelay: `${i * 0.2}s`,
-            animationDuration: `${1.5 + i * 0.3}s`
-        });
+        heart.style.left = `${x}px`;
+        heart.style.top = `${y}px`;
+        heart.style.animation = `float ${1.5 + i * 0.3}s linear forwards`;
         
-        document.body.appendChild(heart);
-        setTimeout(() => heart.remove(), 2000 + i * 300);
+        container.appendChild(heart);
+        setTimeout(() => heart.remove(), (1.5 + i * 0.3) * 1000);
     }
 }
 
