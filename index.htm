@@ -1,47 +1,44 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Love 🦝❤️</title>
-    <!-- Google Fonts: Pacifico and Dancing Script -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script:wght@500&display=swap"
-        rel="stylesheet"
-    />
-    <!-- Main Stylesheet -->
-    <link rel="stylesheet" href="stili.css" />
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Dancing+Script :wght@500&display=swap" rel="stylesheet">
+    
+    <!-- Model Viewer (corretto) -->
+    <script type="module" src="https://unpkg.com/ @google/model-viewer/dist/model-viewer.min.js" defer></script>
+    
+    <!-- Stili principali -->
+    <link rel="stylesheet" href="3dstyles.css">
+    
+    <!-- Script principale -->
+    <script src="3dscript.js" defer></script>
 </head>
 <body>
-    <!-- Contenitore per le pagine dinamiche -->
-    <div id="contenitorePagine"></div>
+    <!-- Contenitore delle pagine -->
+    <div id="pagesContainer"></div>
 
-    <!-- Overlay per la transizione tra pagine -->
-    <div class="transizione-pagina"></div>
+    <!-- Suono del battito cardiaco -->
+    <audio id="heartSound" src="heartbeat.mp3" preload="auto"></audio>
 
-    <!-- Suono del battito del cuore -->
-    <audio id="suonoCuore" preload="auto">
-        <source src="heartbeat.mp3" type="audio/mpeg">
-        <source src="heartbeat.ogg" type="audio/ogg">
-    </audio>
-
-    <!-- Template per la struttura della pagina -->
-    <template id="template-pagina">
-        <div class="contenitore">
-            <div class="misuratore-amore">
-                <div class="barra-progresso">
-                    <div class="riempimento-progresso"></div>
+    <!-- Template della pagina -->
+    <template id="page-template">
+        <div class="container">
+            <div class="love-meter">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
                 </div>
-                <span class="conteggio-click"></span>
             </div>
-            <div class="messaggio-romantico"></div>
-            <div class="contenitore-procione">
-                <div class="procione"></div>
+            
+            <div class="romantic-message"></div>
+            
+            <div class="raccoon-container">
+                <div class="raccoon"></div>
             </div>
         </div>
     </template>
-
-    <!-- Script principale -->
-    <script src="script.js"></script>
 </body>
 </html>
