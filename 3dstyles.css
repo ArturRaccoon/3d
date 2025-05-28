@@ -201,4 +201,8 @@ body {
   .romantic-message {
     font-size: 1.2em;
   }
+  .raccoon {
+    width: 145%;
+    height: 170%;
+  }
 }
