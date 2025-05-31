@@ -43,14 +43,8 @@ const positionsM = [
 ];
 
 const pageBackgrounds = [
-  'bg1.mp4',
-  'bg2.mp4',
-  'bg3.mp4',
-  'bg4.mp4',
-  'bg5.mp4',
-  'bg6.mp4',
-  'bg7.mp4',
-  'bg8.jpg'
+  'bg1.mp4', 'bg2.mp4', 'bg3.mp4', 'bg4.mp4',
+  'bg5.mp4', 'bg6.mp4', 'bg7.mp4', 'bg8.jpg'
 ];
 
 let clickCount = 0;
@@ -58,6 +52,8 @@ const maxClicks = raccoonStates.length - 1;
 let currentPage;
 const pagesContainer = document.getElementById('pagesContainer');
 const heartSound = document.getElementById('heartSound');
+const heartbeatAudio = new Audio('heartbeat.mp3');
+heartbeatAudio.preload = 'auto';
 
 function smoothScrollTo(target, duration) {
   const start = window.pageYOffset;
@@ -66,10 +62,10 @@ function smoothScrollTo(target, duration) {
   const startTime = performance.now();
 
   function scrollStep(currentTime) {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      window.scrollTo(0, start + distance * progress);
-      if (elapsed < duration) requestAnimationFrame(scrollStep);
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    window.scrollTo(0, start + distance * progress);
+    if (elapsed < duration) requestAnimationFrame(scrollStep);
   }
 
   requestAnimationFrame(scrollStep);
@@ -79,30 +75,17 @@ function createPage(index) {
   const page = document.createElement('div');
   page.className = 'page soft-in';
 
-  // Background
   const bg = document.createElement('div');
   bg.className = 'page-bg';
-
   if (pageBackgrounds[index].endsWith('.mp4')) {
-      bg.innerHTML = `
-          <video 
-              autoplay 
-              muted 
-              playsinline 
-              loop 
-              class="bg-video"
-              style="width:100%; height:100%; object-fit:cover;"
-          >
-              <source src="${pageBackgrounds[index]}" type="video/mp4">
-          </video>
-      `;
+    bg.innerHTML = `<video autoplay muted playsinline loop class="bg-video">
+      <source src="${pageBackgrounds[index]}" type="video/mp4">
+    </video>`;
   } else {
-      bg.style.backgroundImage = `url('${pageBackgrounds[index]}')`;
+    bg.style.backgroundImage = `url('${pageBackgrounds[index]}')`;
   }
-
   page.appendChild(bg);
 
-  // Content
   const container = document.createElement('div');
   container.className = 'container';
 
@@ -125,45 +108,36 @@ function createPage(index) {
   mediaElement.className = 'raccoon';
 
   if (raccoonStates[index].endsWith('.glb')) {
-      mediaElement.innerHTML = `
-          <model-viewer 
-              src="${raccoonStates[index]}" 
-              autoplay 
-              animation-name="dance" 
-              auto-rotate 
-              camera-controls 
-              style="width:100%; height:100%;"
-          ></model-viewer>
-      `;
+    mediaElement.innerHTML = `
+      <model-viewer src="${raccoonStates[index]}" autoplay animation-name="dance" auto-rotate camera-controls style="width:100%; height:100%;">
+      </model-viewer>`;
   } else {
-      mediaElement.innerHTML = `
-          <video 
-              autoplay 
-              muted 
-              playsinline 
-              loop 
-              style="width:100%; height:100%; object-fit:contain;"
-          >
-              <source src="${raccoonStates[index]}" type="video/mp4">
-          </video>
-      `;
+    mediaElement.innerHTML = `<video autoplay muted playsinline loop style="width:100%; height:100%; object-fit:contain;">
+      <source src="${raccoonStates[index]}" type="video/mp4">
+    </video>`;
+    mediaElement.classList.add('heartbeat');
+
+    const step = Math.max(0, Math.min(index, raccoonStates.length - 1));
+    const speed = 2 - (step / (raccoonStates.length - 1)) * 1.2;
+    mediaElement.style.setProperty('--heartbeat-speed', `${speed.toFixed(2)}s`);
+    heartbeatAudio.pause();
+    heartbeatAudio.currentTime = 0;
+    heartbeatAudio.playbackRate = 1 / speed;
+    heartbeatAudio.play().catch(() => {});
   }
 
   raccoonContainer.appendChild(mediaElement);
   container.appendChild(raccoonContainer);
   page.appendChild(container);
-
   return page;
 }
 
 function attachEvents(page) {
   const raccoonContainer = page.querySelector('.raccoon-container');
-
   const handleClick = (e) => {
-      e.preventDefault();
-      if (clickCount < maxClicks) handleInteraction(e, raccoonContainer);
+    e.preventDefault();
+    if (clickCount < maxClicks) handleInteraction(e, raccoonContainer);
   };
-
   raccoonContainer.addEventListener('click', handleClick);
   raccoonContainer.addEventListener('touchstart', handleClick, { passive: false });
 }
@@ -171,17 +145,14 @@ function attachEvents(page) {
 function handleInteraction(event, container) {
   clickCount++;
   animateElements(container, event);
-
-  if (clickCount < maxClicks) { 
-      // Finché non arrivi all'ultimo stato
-      const newPage = createPage(clickCount);
-      pagesContainer.appendChild(newPage);
-      smoothScrollTo(newPage, 1000);
-      attachEvents(newPage);
-      currentPage = newPage;
+  if (clickCount < maxClicks) {
+    const newPage = createPage(clickCount);
+    pagesContainer.appendChild(newPage);
+    smoothScrollTo(newPage, 1000);
+    attachEvents(newPage);
+    currentPage = newPage;
   } else {
-      // Al settimo click (maxClicks), mostra frasi finali senza aggiungere pagina
-      mostraFrasiFinaliSovrapposte();
+    mostraFrasiFinaliSovrapposte();
   }
 }
 
@@ -197,107 +168,73 @@ function createHearts(event, container) {
   const rect = container.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
-
   for (let i = 0; i < 5; i++) {
-      const heart = document.createElement('div');
-      heart.className = 'heart';
-      heart.style.left = `${x}px`;
-      heart.style.top = `${y}px`;
-      heart.style.animation = `float ${1.5 + i * 0.3}s linear forwards`;
-
-      container.appendChild(heart);
-      setTimeout(() => heart.remove(), (1.5 + i * 0.3) * 1000);
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.style.left = `${x}px`;
+    heart.style.top = `${y}px`;
+    heart.style.animation = `float ${1.5 + i * 0.3}s linear forwards`;
+    container.appendChild(heart);
+    setTimeout(() => heart.remove(), (1.5 + i * 0.3) * 1000);
   }
 }
 
 function mostraFrasiFinaliSovrapposte() {
-  // Crea overlay finale
-  const overlayFinale = document.createElement('div');
-  overlayFinale.id = 'finalPage';
+  const overlay = document.createElement('div');
+  overlay.id = 'finalPage';
 
-  const testo1 = document.createElement('div');
-  testo1.className = 'epic-text';
-  testo1.id = 'finalText1';
-  testo1.textContent = "Ох! Це так мило! Ти заповнила моє серце💓";
+  const t1 = document.createElement('div');
+  t1.className = 'epic-text';
+  t1.id = 'finalText1';
+  const t2 = t1.cloneNode();
+  t2.id = 'finalText2';
+  const t3 = t1.cloneNode();
+  t3.id = 'finalText3';
 
-  const testo2 = document.createElement('div');
-  testo2.className = 'epic-text';
-  testo2.id = 'finalText2';
-  testo2.style.display = 'none';
-  testo2.textContent = "Я кохаю тебе";
+  const container = document.createElement('div');
+  container.id = 'buttonsContainer';
 
-  const testo3 = document.createElement('div');
-  testo3.className = 'epic-text';
-  testo3.id = 'finalText3';
-  testo3.style.display = 'none';
-  testo3.textContent = "А ти мене?";
-
-  const buttonsContainer = document.createElement('div');
-  buttonsContainer.id = 'buttonsContainer';
-
-  const buttonsData = [
-      { text: 'Sì', lang: 'it' },
-      { text: 'Oui', lang: 'fr' },
-      { text: 'Yes', lang: 'en' },
-      { text: 'Так', lang: 'uk' }
+  const phrases = [
+    { el: t1, text: 'Ох! Це так мило! Ти заповнила моє серце💓' },
+    { el: t2, text: 'Я кохаю тебе' },
+    { el: t3, text: 'А ти мене?' }
   ];
 
-  buttonsData.forEach(btnData => {
-      const btn = document.createElement('button');
-      btn.className = 'answer-button';
-      btn.textContent = btnData.text;
-      btn.addEventListener('click', () => {
-          alert(`Grazie per aver scelto "${btnData.text}"! 💕`);
-      });
-      buttonsContainer.appendChild(btn);
+  phrases.forEach((p, i) => {
+    p.el.textContent = p.text;
+    p.el.style.display = 'none';
+    overlay.appendChild(p.el);
   });
 
-  overlayFinale.appendChild(testo1);
-  overlayFinale.appendChild(testo2);
-  overlayFinale.appendChild(testo3);
-  overlayFinale.appendChild(buttonsContainer);
+  const options = ['Sì', 'Oui', 'Yes', 'Так'];
+  options.forEach(txt => {
+    const b = document.createElement('button');
+    b.className = 'answer-button';
+    b.textContent = txt;
+    b.onclick = () => alert(`Grazie per aver scelto "${txt}"! 💕`);
+    container.appendChild(b);
+  });
 
-  document.body.appendChild(overlayFinale);
+  overlay.appendChild(container);
+  document.body.appendChild(overlay);
 
-  // Animazioni sequenziali testi e mostra bottoni
-  const showText = (element, delay) => {
-      setTimeout(() => {
-          element.style.display = 'block';
-          element.style.animation = 'textReveal 1.5s ease forwards';
-      }, delay);
-  };
-
-  const hideText = (element, delay) => {
-      setTimeout(() => {
-          element.style.animation = 'fadeOut 0.5s ease forwards';
-          setTimeout(() => {
-              element.style.display = 'none';
-              element.style.animation = '';
-          }, 500);
-      }, delay);
-  };
-
-  showText(testo1, 500);
-  showText(testo2, 2000); // dopo testo1
-  showText(testo3, 4000);
-
+  // Animazioni frasi
+  setTimeout(() => phrases[0].el.style.display = 'block', 500);
+  setTimeout(() => phrases[1].el.style.display = 'block', 2500);
+  setTimeout(() => phrases[2].el.style.display = 'block', 4500);
   setTimeout(() => {
-      hideText(testo2, 6000);
-      setTimeout(() => {
-          showText(testo2, 6500);
-      }, 500);
-  }, 500);
-
+    phrases[1].el.style.display = 'none';
+    setTimeout(() => phrases[1].el.textContent = 'Я кохаю тебе', 500);
+    setTimeout(() => phrases[1].el.style.display = 'block', 1000);
+  }, 6500);
   setTimeout(() => {
-      hideText(testo3, 8000);
-      setTimeout(() => {
-          showText(testo3, 8500);
-      }, 500);
-  }, 500);
-
+    phrases[2].el.style.display = 'none';
+    setTimeout(() => phrases[2].el.textContent = 'А ти мене?', 500);
+    setTimeout(() => phrases[2].el.style.display = 'block', 1000);
+  }, 8500);
   setTimeout(() => {
-      buttonsContainer.style.display = 'flex';
-      buttonsContainer.style.animation = 'textReveal 1.5s ease forwards';
+    container.style.display = 'flex';
+    container.style.animation = 'textReveal 1.5s ease forwards';
   }, 10500);
 }
 
