@@ -1,4 +1,6 @@
-/* Reset e impostazioni base */
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script&family=Poppins:wght@400;600&display=swap');
+
+/* Reset e base */
 * {
   margin: 0;
   padding: 0;
@@ -6,19 +8,19 @@
 }
 
 body {
-  font-family: 'Dancing Script', ;
+  font-family: 'Dancing Script', cursive;
   background: #061117;
   overflow-x: hidden;
   min-height: 100vh;
 }
 
-/* Contenitore delle pagine */
+/* Contenitore pagine */
 #pagesContainer {
   scroll-behavior: smooth;
   position: relative;
 }
 
-/* Configurazione pagina */
+/* Singola pagina */
 .page {
   height: 100vh;
   width: 100vw;
@@ -26,7 +28,7 @@ body {
   overflow: hidden;
 }
 
-/* Sfondo pagine */
+/* Sfondo video/immagine */
 .page-bg {
   position: absolute;
   top: 0;
@@ -63,7 +65,7 @@ body {
   transition: width 0.5s ease;
 }
 
-/* Messaggio romantico */
+/* Messaggi romantici */
 .romantic-message {
   position: absolute;
   font-size: 1.5em;
@@ -78,7 +80,7 @@ body {
   z-index: 20;
 }
 
-/* Contenitore del procione */
+/* Contenitore procione */
 .raccoon-container {
   position: absolute;
   width: 320px;
@@ -95,14 +97,28 @@ body {
   clip-path: path("M180,45 C128,0 0,110 180,210 C360,110 232,0 180,45 Z");
 }
 
-/* Animazione galleggiamento */
-@keyframes floating {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0); }
+/* Battito video procione */
+.raccoon.heartbeat {
+  animation: heartbeatVideo var(--heartbeat-speed, 1.2s) infinite ease-in-out;
+  transform-origin: center center;
 }
 
-/* Cuori originali */
+@keyframes heartbeatVideo {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.15);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  75% {
+    transform: scale(1.1);
+  }
+}
+
+/* Cuori galleggianti */
 .heart {
   position: absolute;
   width: 20px;
@@ -143,7 +159,7 @@ body {
   }
 }
 
-/* Animazione trasformazione */
+/* Trasformazione procione */
 @keyframes epicTransform {
   0% {
     transform: scale(0.8) rotate(20deg);
@@ -163,7 +179,7 @@ body {
   animation: epicTransform 1s ease forwards;
 }
 
-/* Checkmark animato */
+/* Animazione checkmark */
 .picture-mark {
   position: absolute;
   top: 50%;
@@ -178,37 +194,19 @@ body {
 @keyframes markFade {
   0% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.5);
+    transform: scale(0.5);
   }
   50% {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1.2);
+    transform: scale(1.2);
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
   }
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .raccoon-container {
-    width: 240px;
-    height: 135px;
-    transform: scale(0.8);
-  }
-  
-  .romantic-message {
-    font-size: 1.2em;
-  }
-  .raccoon {
-    width: 145%;
-    height: 170%;
-  }
-}
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
+/* Pagina finale sovrapposta */
 #finalPage {
   position: fixed;
   top: 0;
@@ -219,7 +217,6 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* background leggero per evitare pagina nera */
   background: linear-gradient(135deg, #15a378, #b744adc3, #fffc3f);
   z-index: 1000;
   font-family: 'Poppins', sans-serif;
@@ -240,12 +237,8 @@ body {
 }
 
 @keyframes fadeOut {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
+  0% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 .epic-text {
@@ -292,26 +285,36 @@ body {
   outline: none;
 }
 
-@keyframes buttonPulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.06);
-  }
-}
-
+/* Mobile responsive */
 @media (max-width: 768px) {
+  .raccoon-container {
+    width: 240px;
+    height: 135px;
+    transform: scale(0.8);
+  }
+
+  .romantic-message {
+    font-size: 1.2em;
+  }
+
+  .raccoon {
+    width: 145%;
+    height: 170%;
+  }
+
   #finalPage {
     padding: 15px;
   }
+
   .epic-text {
     font-size: 2.8rem;
   }
+
   #buttonsContainer {
     gap: 15px;
     margin-top: 25px;
   }
+
   .answer-button {
     padding: 12px 22px;
     font-size: 16px;
