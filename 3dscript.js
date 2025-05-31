@@ -1,45 +1,48 @@
-const messaggiRomantici = [
+const romanticMessages = [
   "Історія кохання починається...",
   "Наші серця б'ються одночасно",
   "Моя лінія життя перетинається з твоєю",
   "Ти мій місяць",
   "Ти моє сонце",
   "Ти мої зірки",
-  "Я вже близько..."
+  "Я уже близько...",
+  "Ох! Це так мило, ти заповнила моє серце 💞"
 ];
 
-const statiProcione = [
+const raccoonStates = [
   'beggining.mp4',
   'sync.mp4',
   'lines.mp4',
   'moon.mp4',
   'sun.mp4',
   'stars.mp4',
-  'heart.mp4'
+  'heart.mp4',
+  'raccoon.glb'
 ];
 
-const posizioni = [
-  { top: "15%", left: "15%" },   // Era -100%, ora sicuro
-  { top: "-30%", left: "10%" },   // Era -90%, ora sicuro  
-  { top: "-50%", left: "0%" },   // Era -30%, migliorato
-  { top: "45%", left: "15%" },   // Era -10%, ora sicuro
-  { top: "20%", left: "25%" },   // Era -40%, ora sicuro
-  { top: "30%", left: "18%" },   // Era -65%, ora sicuro
-  { top: "40%", left: "22%" }    // Era -30%, migliorato
+const positions = [
+  { top: "30%", left: "10%" },
+  { top: "10%", left: "69%" },
+  { top: "20%", left: "10%" },
+  { top: "60%", left: "50%" },
+  { top: "10%", left: "30%" },
+  { top: "65%", left: "65%" },
+  { top: "30%", left: "30%" },
+  { top: "50%", left: "50%" }
 ];
 
-// Posizioni ottimizzate per mobile - centrate e sicure
-const posizioniMobile = [
-  { top: "20%", left: "15%" },   // Spostato dal bordo
-  { top: "-50%", left: "12%" },   // Migliorato
-  { top: "-60%", left: "5%" },   // Spostato dal bordo (era 0%)
-  { top: "25%", left: "20%" },   // Spostato dal bordo (era 0%)
-  { top: "35%", left: "15%" },   // Spostato dal bordo (era 0%)
-  { top: "45%", left: "16%" },   // Spostato dal bordo (era 0%)
-  { top: "50%", left: "14%" }    // Spostato dal bordo (era 0%)
+const positionsM = [
+  { left: "10%", top: "10%" },
+  { left: "60%", top: "15%" },
+  { left: "20%", top: "30%" },
+  { left: "50%", top: "90%" },
+  { left: "30%", top: "50%" },
+  { left: "70%", top: "60%" },
+  { left: "40%", top: "70%" },
+  { left: "20%", top: "20%" }
 ];
 
-const sfondiPagina = [
+const pageBackgrounds = [
   'bg1.mp4',
   'bg2.mp4',
   'bg3.mp4',
@@ -50,314 +53,256 @@ const sfondiPagina = [
   'bg8.jpg'
 ];
 
-let contatoreClick = 0;
-const maxClick = statiProcione.length;
-let paginaCorrente;
-let scrollInCorso = false;
-const contenitorePagine = document.getElementById('pagesContainer');
-const suonoCuore = document.getElementById('heartSound');
+let clickCount = 0;
+const maxClicks = raccoonStates.length - 1;
+let currentPage;
+const pagesContainer = document.getElementById('pagesContainer');
+const heartSound = document.getElementById('heartSound');
 
-// Scroll morbido e lento
-function scorrimentoFluido(target, durata = 2200) {
-  if (scrollInCorso) return;
-  
-  scrollInCorso = true;
-  const inizio = window.pageYOffset;
-  const fine = target.offsetTop;
-  const distanza = fine - inizio;
-  const tempoInizio = performance.now();
+function smoothScrollTo(target, duration) {
+  const start = window.pageYOffset;
+  const end = target.offsetTop;
+  const distance = end - start;
+  const startTime = performance.now();
 
-  // Easing più morbido - combinazione di ease-in-out con rallentamento finale
-  function easingMorbido(t) {
-    if (t < 0.5) {
-      return 2 * t * t;
-    } else {
-      return 1 - Math.pow(-2 * t + 2, 3) / 2;
-    }
+  function scrollStep(currentTime) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      window.scrollTo(0, start + distance * progress);
+      if (elapsed < duration) requestAnimationFrame(scrollStep);
   }
 
-  function passoScorrimento(tempoCorrente) {
-    const trascorso = tempoCorrente - tempoInizio;
-    const progresso = Math.min(trascorso / durata, 1);
-    const progressoEased = easingMorbido(progresso);
-    
-    window.scrollTo(0, inizio + distanza * progressoEased);
-    
-    if (progresso < 1) {
-      requestAnimationFrame(passoScorrimento);
-    } else {
-      scrollInCorso = false;
-    }
-  }
-
-  requestAnimationFrame(passoScorrimento);
+  requestAnimationFrame(scrollStep);
 }
 
-function creaPagina(indice) {
-  const pagina = document.createElement('div');
-  pagina.className = 'page soft-in';
-  pagina.setAttribute('data-page-index', indice);
+function createPage(index) {
+  const page = document.createElement('div');
+  page.className = 'page soft-in';
 
-  const sfondo = document.createElement('div');
-  sfondo.className = 'page-bg';
+  // Background
+  const bg = document.createElement('div');
+  bg.className = 'page-bg';
 
-  if (sfondiPagina[indice].endsWith('.mp4')) {
-    sfondo.innerHTML = `
-      <video autoplay muted playsinline loop class="bg-video" style="width:100%; height:100%; object-fit:cover;">
-        <source src="${sfondiPagina[indice]}" type="video/mp4">
-      </video>
-    `;
+  if (pageBackgrounds[index].endsWith('.mp4')) {
+      bg.innerHTML = `
+          <video 
+              autoplay 
+              muted 
+              playsinline 
+              loop 
+              class="bg-video"
+              style="width:100%; height:100%; object-fit:cover;"
+          >
+              <source src="${pageBackgrounds[index]}" type="video/mp4">
+          </video>
+      `;
   } else {
-    sfondo.style.backgroundImage = `url('${sfondiPagina[indice]}')`;
+      bg.style.backgroundImage = `url('${pageBackgrounds[index]}')`;
   }
 
-  pagina.appendChild(sfondo);
+  page.appendChild(bg);
 
-  const contenitore = document.createElement('div');
-  contenitore.className = 'container';
+  // Content
+  const container = document.createElement('div');
+  container.className = 'container';
 
-  const barraProgresso = document.createElement('div');
-  barraProgresso.className = 'progress-bar';
-  barraProgresso.innerHTML = `<div class="progress-fill" style="width:${(indice / (maxClick - 1)) * 100}%"></div>`;
-  contenitore.appendChild(barraProgresso);
+  const progressBar = document.createElement('div');
+  progressBar.className = 'progress-bar';
+  progressBar.innerHTML = `<div class="progress-fill" style="width:${(index / maxClicks) * 100}%"></div>`;
+  container.appendChild(progressBar);
 
-  const messaggio = document.createElement('div');
-  messaggio.className = 'romantic-message';
-  messaggio.textContent = messaggiRomantici[indice];
-  Object.assign(messaggio.style, posizioniMobile[indice] || {});
-  contenitore.appendChild(messaggio);
+  const message = document.createElement('div');
+  message.className = 'romantic-message';
+  message.textContent = romanticMessages[index];
+  Object.assign(message.style, positionsM[index] || {});
+  container.appendChild(message);
 
-  const contenitoreProcione = document.createElement('div');
-  contenitoreProcione.className = 'raccoon-container';
-  Object.assign(contenitoreProcione.style, posizioni[indice] || {});
+  const raccoonContainer = document.createElement('div');
+  raccoonContainer.className = 'raccoon-container';
+  Object.assign(raccoonContainer.style, positions[index] || {});
 
-  const elementoMedia = document.createElement('div');
-  elementoMedia.className = 'raccoon';
+  const mediaElement = document.createElement('div');
+  mediaElement.className = 'raccoon';
 
-  elementoMedia.innerHTML = `
-    <video autoplay muted playsinline loop style="width:100%; height:100%; object-fit:contain;">
-      <source src="${statiProcione[indice]}" type="video/mp4">
-    </video>
-  `;
+  if (raccoonStates[index].endsWith('.glb')) {
+      mediaElement.innerHTML = `
+          <model-viewer 
+              src="${raccoonStates[index]}" 
+              autoplay 
+              animation-name="dance" 
+              auto-rotate 
+              camera-controls 
+              style="width:100%; height:100%;"
+          ></model-viewer>
+      `;
+  } else {
+      mediaElement.innerHTML = `
+          <video 
+              autoplay 
+              muted 
+              playsinline 
+              loop 
+              style="width:100%; height:100%; object-fit:contain;"
+          >
+              <source src="${raccoonStates[index]}" type="video/mp4">
+          </video>
+      `;
+  }
 
-  const passiTotali = statiProcione.length - 1;
-  const passo = Math.max(0, Math.min(indice, passiTotali));
-  const velocita = 3.2 - (passo / passiTotali) * (3.2 - 0.4);
-  elementoMedia.style.setProperty('--heartbeat-speed', `${velocita.toFixed(2)}s`);
+  raccoonContainer.appendChild(mediaElement);
+  container.appendChild(raccoonContainer);
+  page.appendChild(container);
 
-  contenitoreProcione.appendChild(elementoMedia);
-  contenitore.appendChild(contenitoreProcione);
-  pagina.appendChild(contenitore);
-
-  return pagina;
+  return page;
 }
 
-function collegaEventi(pagina) {
-  const contenitoreProcione = pagina.querySelector('.raccoon-container');
+function attachEvents(page) {
+  const raccoonContainer = page.querySelector('.raccoon-container');
 
-  const gestisciClick = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Evita doppi click durante lo scroll
-    if (scrollInCorso) return;
-
-    // PERMETTE IL CLICK ANCHE SE GIA' CLICCATO, SOLO SE SIAMO ALL'ULTIMA PAGINA
-    if (contenitoreProcione.dataset.clicked === 'true' && contatoreClick < maxClick) return;
-
-    contenitoreProcione.dataset.clicked = 'true';
-
-    if (contatoreClick < maxClick) {
-      gestisciInterazione(e, contenitoreProcione);
-    }
+  const handleClick = (e) => {
+      e.preventDefault();
+      if (clickCount < maxClicks) handleInteraction(e, raccoonContainer);
   };
 
-  contenitoreProcione.addEventListener('click', gestisciClick);
-  contenitoreProcione.addEventListener('touchstart', gestisciClick, { passive: false });
+  raccoonContainer.addEventListener('click', handleClick);
+  raccoonContainer.addEventListener('touchstart', handleClick, { passive: false });
 }
 
-function gestisciInterazione(evento, contenitore) {
-  contatoreClick++;
-  animaElementi(contenitore, evento);
+function handleInteraction(event, container) {
+  clickCount++;
+  animateElements(container, event);
 
-  if (contatoreClick < maxClick) {
-    // Breve delay prima di creare la nuova pagina per evitare lag
-    setTimeout(() => {
-      const nuovaPagina = creaPagina(contatoreClick);
-      contenitorePagine.appendChild(nuovaPagina);
-      
-      // Scroll morbido con delay maggiore
-      setTimeout(() => {
-        scorrimentoFluido(nuovaPagina, 2500);
-      }, 300);
-      
-      collegaEventi(nuovaPagina);
-      paginaCorrente = nuovaPagina;
-    }, 400);
+  if (clickCount < maxClicks) { 
+      // Finché non arrivi all'ultimo stato
+      const newPage = createPage(clickCount);
+      pagesContainer.appendChild(newPage);
+      smoothScrollTo(newPage, 1000);
+      attachEvents(newPage);
+      currentPage = newPage;
   } else {
-    // Dopo l'ultima interazione, mostra le frasi finali sull'ultima pagina
-    setTimeout(() => {
+      // Al settimo click (maxClicks), mostra frasi finali senza aggiungere pagina
       mostraFrasiFinaliSovrapposte();
-    }, 800);
   }
 }
 
-function animaElementi(contenitore, evento) {
-  const procione = contenitore.querySelector('.raccoon');
-  procione.classList.add('epic');
-  setTimeout(() => procione.classList.remove('epic'), 1000);
-
-  creaCuori(evento, contenitore);
-  suonoCuore.play().catch(() => { });
+function animateElements(container, event) {
+  const raccoon = container.querySelector('.raccoon');
+  raccoon.classList.add('epic');
+  setTimeout(() => raccoon.classList.remove('epic'), 1000);
+  createHearts(event, container);
+  heartSound.play().catch(() => {});
 }
 
-function creaCuori(evento, contenitore) {
-  const rettangolo = contenitore.getBoundingClientRect();
-  const x = evento.clientX - rettangolo.left;
-  const y = evento.clientY - rettangolo.top;
+function createHearts(event, container) {
+  const rect = container.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
 
   for (let i = 0; i < 5; i++) {
-    const cuore = document.createElement('div');
-    cuore.className = 'heart';
-    cuore.style.left = `${x}px`;
-    cuore.style.top = `${y}px`;
-    cuore.style.animation = `float ${1.5 + i * 0.3}s linear forwards`;
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.style.left = `${x}px`;
+      heart.style.top = `${y}px`;
+      heart.style.animation = `float ${1.5 + i * 0.3}s linear forwards`;
 
-    contenitore.appendChild(cuore);
-    setTimeout(() => cuore.remove(), (1.5 + i * 0.3) * 1000);
+      container.appendChild(heart);
+      setTimeout(() => heart.remove(), (1.5 + i * 0.3) * 1000);
   }
 }
 
 function mostraFrasiFinaliSovrapposte() {
-  // Trova l'ultima pagina creata
-  const ultimaPagina = contenitorePagine.lastElementChild;
-  
-  // Crea l'overlay delle frasi finali
+  // Crea overlay finale
   const overlayFinale = document.createElement('div');
-  overlayFinale.className = 'final-overlay';
   overlayFinale.id = 'finalPage';
-  
-  // Contenitore dei testi
-  const contenitoreTesti = document.createElement('div');
-  contenitoreTesti.className = 'epic-text-container';
-  
-  // Testi dinamici
+
   const testo1 = document.createElement('div');
   testo1.className = 'epic-text';
   testo1.id = 'finalText1';
-  
+  testo1.textContent = "Ох! Це так мило! Ти заповнила моє серце💓";
+
   const testo2 = document.createElement('div');
   testo2.className = 'epic-text';
   testo2.id = 'finalText2';
-  
+  testo2.style.display = 'none';
+  testo2.textContent = "Я кохаю тебе";
+
   const testo3 = document.createElement('div');
   testo3.className = 'epic-text';
   testo3.id = 'finalText3';
-  
-  contenitoreTesti.appendChild(testo1);
-  contenitoreTesti.appendChild(testo2);
-  contenitoreTesti.appendChild(testo3);
-  
-  // Contenitore bottoni
-  const contenitoreBottoni = document.createElement('div');
-  contenitoreBottoni.id = 'buttonsContainer';
-  
-  const bottoni = [
-    { testo: 'Sì', lingua: 'it' },
-    { testo: 'Oui', lingua: 'fr' },
-    { testo: 'Yes', lingua: 'en' },
-    { testo: 'Так', lingua: 'uk' }
+  testo3.style.display = 'none';
+  testo3.textContent = "А ти мене?";
+
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.id = 'buttonsContainer';
+
+  const buttonsData = [
+      { text: 'Sì', lang: 'it' },
+      { text: 'Oui', lang: 'fr' },
+      { text: 'Yes', lang: 'en' },
+      { text: 'Так', lang: 'uk' }
   ];
 
-  bottoni.forEach(bottone => {
-    const btn = document.createElement('button');
-    btn.textContent = bottone.testo;
-    btn.className = 'answer-button';
-    btn.addEventListener('click', () => {
-      alert(`Grazie per aver scelto "${bottone.testo}"! 💕`);
-    });
-    contenitoreBottoni.appendChild(btn);
+  buttonsData.forEach(btnData => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-button';
+      btn.textContent = btnData.text;
+      btn.addEventListener('click', () => {
+          alert(`Grazie per aver scelto "${btnData.text}"! 💕`);
+      });
+      buttonsContainer.appendChild(btn);
   });
-  
-  overlayFinale.appendChild(contenitoreTesti);
-  overlayFinale.appendChild(contenitoreBottoni);
-  
-  // Aggiungi l'overlay all'ultima pagina
-  ultimaPagina.style.position = 'relative';
-  ultimaPagina.appendChild(overlayFinale);
-  
-  // Inizialmente nascosti
-  testo1.style.display = 'none';
-  testo2.style.display = 'none';
-  testo3.style.display = 'none';
-  contenitoreBottoni.style.display = 'none';
-  
-  // Sequenza delle frasi animate usando le classi CSS
-  const mostraTesto = (elemento, testo, delay) => {
-    setTimeout(() => {
-      elemento.textContent = testo;
-      elemento.style.display = 'block';
-      elemento.style.animation = 'textReveal 1.5s ease forwards';
-    }, delay);
+
+  overlayFinale.appendChild(testo1);
+  overlayFinale.appendChild(testo2);
+  overlayFinale.appendChild(testo3);
+  overlayFinale.appendChild(buttonsContainer);
+
+  document.body.appendChild(overlayFinale);
+
+  // Animazioni sequenziali testi e mostra bottoni
+  const showText = (element, delay) => {
+      setTimeout(() => {
+          element.style.display = 'block';
+          element.style.animation = 'textReveal 1.5s ease forwards';
+      }, delay);
   };
-  
-  const nascondiTesto = (elemento, delay) => {
-    setTimeout(() => {
-      elemento.style.animation = 'fadeOut 0.5s ease forwards';
-    }, delay);
+
+  const hideText = (element, delay) => {
+      setTimeout(() => {
+          element.style.animation = 'fadeOut 0.5s ease forwards';
+          setTimeout(() => {
+              element.style.display = 'none';
+              element.style.animation = '';
+          }, 500);
+      }, delay);
   };
-  
-  // Sequenza temporizzata delle frasi
-  mostraTesto(testo1, "Ох", 500);
-  
+
+  showText(testo1, 500);
+  showText(testo2, 2000); // dopo testo1
+  showText(testo3, 4000);
+
   setTimeout(() => {
-    mostraTesto(testo2, "Це так мило", 2000);
+      hideText(testo2, 6000);
+      setTimeout(() => {
+          showText(testo2, 6500);
+      }, 500);
   }, 500);
-  
+
   setTimeout(() => {
-    mostraTesto(testo3, "Ти заповнила моє серце", 4000);
+      hideText(testo3, 8000);
+      setTimeout(() => {
+          showText(testo3, 8500);
+      }, 500);
   }, 500);
-  
+
   setTimeout(() => {
-    nascondiTesto(testo2, 6000);
-    setTimeout(() => {
-      mostraTesto(testo2, "Я кохаю тебе", 6500);
-    }, 500);
-  }, 500);
-  
-  setTimeout(() => {
-    nascondiTesto(testo3, 8000);
-    setTimeout(() => {
-      mostraTesto(testo3, "А ти мене?", 8500);
-    }, 500);
-  }, 500);
-  
-  setTimeout(() => {
-    contenitoreBottoni.style.display = 'flex';
-    contenitoreBottoni.style.animation = 'textReveal 1.5s ease forwards';
+      buttonsContainer.style.display = 'flex';
+      buttonsContainer.style.animation = 'textReveal 1.5s ease forwards';
   }, 10500);
 }
 
-// Inizializzazione ottimizzata
 document.addEventListener('DOMContentLoaded', () => {
-  // Preload delle prime immagini/video per ridurre lag
-  const preloadMedia = () => {
-    sfondiPagina.slice(0, 3).forEach(src => {
-      if (src.endsWith('.mp4')) {
-        const video = document.createElement('video');
-        video.src = src;
-        video.preload = 'metadata';
-      } else {
-        const img = new Image();
-        img.src = src;
-      }
-    });
-  };
-  
-  preloadMedia();
-  
-  // Crea la prima pagina
-  paginaCorrente = creaPagina(0);
-  contenitorePagine.appendChild(paginaCorrente);
-  collegaEventi(paginaCorrente);
+  currentPage = createPage(0);
+  pagesContainer.appendChild(currentPage);
+  attachEvents(currentPage);
 });
